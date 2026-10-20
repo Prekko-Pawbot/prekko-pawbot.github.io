@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prekko Pawbot: it plays like prey</title>
+<meta name="description" content="A small robot that moves a fishing-rod toy like real prey, so your cat gets to hunt, and catch. Working prototype. Join the waitlist.">
+<meta name="theme-color" content="#0f0e15">
+<meta property="og:title" content="Your cat waits all day for something to move. Now something does.">
+<meta property="og:description" content="A small robot that plays with your cat like real prey, and learns what your cat loves. Working prototype; join the waitlist.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://prekko.com/media/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A ginger cat watching a feather lure held out by a small robot with a fishing rod.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon-180.png">
+<link rel="preload" as="image" href="media/hero-poster-wide.webp" media="(orientation: landscape)" fetchpriority="high">
+<link rel="preload" as="image" href="media/hero-poster-tall.webp" media="(orientation: portrait)" fetchpriority="high">
+<noscript><style>.ctl{display:none}</style></noscript>
+<link rel="preload" as="font" type="font/woff2" href="fonts/instrument-serif-400.woff2" crossorigin>
+<style>
+@font-face{font-family:"Instrument Serif";font-weight:400;font-display:swap;src:url(fonts/instrument-serif-400.woff2) format("woff2")}
+@font-face{font-family:"Geist";font-weight:400;font-display:swap;src:url(fonts/geist-400.woff2) format("woff2")}
+/* Fallbacks scaled to the web fonts' widths, so the swap barely moves a line */
+@font-face{font-family:"Serif FB";src:local("Georgia"),local("Times New Roman");size-adjust:76.8%}
+@font-face{font-family:"Sans FB";src:local("Arial"),local("Helvetica"),local("Segoe UI");size-adjust:106.8%}
+:root{
+  --bg:#0f0e15;      /* the film's own black: the frame melts into the page */
+  --dusk:#1b1b25;    /* panels */
+  --sun:#f1dc8c;     /* the sunbeam: primary actions */
+  --ink:#f2edd8;     /* text */
+  --muted:#bebdcc;   /* secondary text */
+  --line:rgba(242,237,216,.16);
+  --serif:"Instrument Serif","Serif FB",Georgia,serif;
+  --sans:"Geist","Sans FB",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --g:16px; --hdr:56px; --band:176px;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%;scroll-padding-top:72px}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--sans);overflow-x:clip}
+a{color:var(--sun);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--sun);outline-offset:3px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;max-width:100%;padding:0 20px;border-radius:999px;font:400 16px/1.15 var(--sans);text-decoration:none;text-align:center;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+@media (max-width:480px){.btn{white-space:normal;padding-top:6px;padding-bottom:6px}}
+.btn--sun{background:var(--sun);color:#16151c}
+.btn--sun:hover{background:#f6e7ad}
+.btn--ghost{background:transparent;color:var(--ink);border-color:rgba(242,237,216,.38)}
+.btn--ghost:hover{border-color:var(--ink)}
+.btn small{font-size:14px;color:var(--muted)}
+
+/* Header: fixed, transparent on the film, solid once you scroll */
+.top{position:fixed;inset:0 0 auto;z-index:5;height:var(--hdr);display:flex;align-items:center;justify-content:space-between;padding:0 var(--g);padding-top:env(safe-area-inset-top);transition:background-color .3s}
+.top.solid{background:var(--bg);box-shadow:0 1px 0 var(--line)}
+.top .btn{min-height:40px;padding:0 16px;font-size:15px}
+.brand{display:block;padding:10px 6px;margin-left:-6px;color:var(--ink)}
+.brand svg{display:block;width:104px;height:27px}
+#sentinel{position:absolute;top:0;height:8px;width:1px}
+
+/* The film */
+.hero{position:relative}
+.film{position:relative;margin:0 auto;background:var(--bg);aspect-ratio:16/9;
+  width:min(100%,calc((100vh - var(--band)) * 16 / 9));width:min(100%,calc((100svh - var(--band)) * 16 / 9))}
+.film picture{position:absolute;inset:0}
+.film img,.film>video,.film>noscript>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.film>video{opacity:0}
+@media (prefers-reduced-motion:no-preference){.film>video{transition:opacity .6s ease-out}}
+.film.on>video{opacity:1}
+/* The end screen darkens only the lower part, so the cat and the machine stay bright behind the buttons */
+.film.ended .end{background:linear-gradient(180deg,rgba(15,14,21,0) 45%,rgba(15,14,21,.82) 100%)}
+.ctl{position:absolute;right:12px;bottom:12px;display:flex;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;padding:0 14px;border-radius:999px;border:1px solid rgba(242,237,216,.3);background:rgba(15,14,21,.72);color:var(--ink);font:400 15px/1 var(--sans);cursor:pointer}
+.pill:hover{border-color:var(--ink)}
+.pill svg{width:18px;height:18px;flex:none}
+#pp{padding:0;justify-content:center}
+#pp .i-play,#pp.paused .i-pause{display:none}
+#pp.paused .i-play{display:block}
+#snd .i-on,#snd.on .i-off{display:none}
+#snd.on .i-on{display:block}
+#snd:not(.on){border-color:var(--sun)}
+@media (prefers-reduced-motion:no-preference){#snd.nudge{animation:nudge 1.1s ease-out 1}}
+@keyframes nudge{0%{box-shadow:0 0 0 0 rgba(241,220,140,.7)}100%{box-shadow:0 0 0 14px rgba(241,220,140,0)}}
+.film.ended .ctl,.film.idle .ctl,.film.nov .ctl{display:none}
+.big{position:absolute;z-index:1;left:50%;top:82%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:14px;min-height:64px;padding:0 26px 0 12px;border-radius:999px;border:0;background:var(--sun);color:#16151c;font:400 18px/1.2 var(--sans);cursor:pointer;text-align:left}
+.big b{font-weight:400;white-space:nowrap}
+.big span{display:block;font-size:14px;opacity:.75}
+.big i{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#16151c;color:var(--sun)}
+.big svg{width:18px;height:18px;margin-left:3px}
+.end{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;align-content:end;gap:12px;padding:16px 16px 7%}
+.end .btn--ghost{background:rgba(15,14,21,.6)}
+[hidden]{display:none!important}
+
+/* Promise band: under the picture, never over it */
+.band{max-width:1180px;max-width:max(1180px,calc((100svh - var(--band)) * 16 / 9));margin:0 auto;padding:14px var(--g) 18px}
+@media (orientation:landscape) and (min-width:720px){.band{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);column-gap:40px;align-items:start}}
+.fine{margin:12px 0 0;font-size:13px;line-height:1.4;color:var(--muted)}
+h1{font-size:clamp(28px,2.4vw,44px);line-height:1.08;text-wrap:balance;margin-bottom:12px}
+@media (orientation:landscape) and (min-width:720px){h1{margin-bottom:0}}
+h1 span{display:block}
+#l2{color:var(--sun);transition:opacity .5s ease-out}
+#l2.wait{opacity:0}
+.sub{margin:0 0 14px;font-size:16px;line-height:1.5;color:var(--ink)}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.cta .btn{flex:0 1 auto}
+@media (orientation:portrait){
+  .film{aspect-ratio:9/16;width:min(100%,calc((100vh - 196px) * 9 / 16));width:min(100%,calc((100svh - 196px) * 9 / 16))}
+  /* On a phone the line that says what it is comes first, right under the film */
+  .band{display:flex;flex-direction:column;padding-top:12px;max-width:560px}
+  .band>div{display:contents}
+  .sub{order:-1;margin-bottom:12px}
+  .fine{font-size:12.5px}
+  h1{font-size:clamp(26px,7.3vw,40px)}
+  .cta .btn{flex:1 1 auto}
+  .big{top:88%}
+  /* The tall film's words fill its lower half: under the end buttons and the Play button they give way to the dark */
+  .film.ended .end{background:linear-gradient(180deg,rgba(15,14,21,0) 50%,rgba(15,14,21,.93) 76%)}
+  .film.idle::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(15,14,21,0) 52%,rgba(15,14,21,.9) 78%)}
+}
+@media (orientation:landscape) and (max-height:520px){:root{--band:0px}}
+
+/* Sections */
+.sec{max-width:1240px;margin:0 auto;padding:72px var(--g)}
+.eyebrow{margin:0 0 10px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h2{font-size:clamp(32px,4vw,56px);line-height:1.05;max-width:20ch;text-wrap:balance}
+.lede{margin:14px 0 0;max-width:46ch;color:var(--muted);font-size:18px}
+.cards:focus-visible{outline-offset:-2px}
+.cards{list-style:none;margin:32px calc(-1 * var(--g)) 0;padding:0 var(--g) 8px;display:grid;grid-auto-flow:column;grid-auto-columns:86%;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--g);overscroll-behavior-x:contain}
+.card{position:relative;scroll-snap-align:start;display:flex;flex-direction:column;background:var(--dusk);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tag{position:absolute;top:10px;left:10px;padding:3px 9px;border-radius:999px;background:rgba(15,14,21,.78);color:var(--ink);font-size:12px;letter-spacing:.04em}
+.card img{display:block;width:100%;height:auto;aspect-ratio:1200/676;background:#14131b}
+.card div{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+.num{font:400 13px/1 var(--sans);letter-spacing:.16em;color:var(--sun);font-variant:small-caps}
+.card h3{font-size:28px;line-height:1.05;margin:8px 0 8px}
+.card p{margin:0 0 14px;color:var(--muted);font-size:16px;line-height:1.5}
+.card button,.card .go{margin-top:auto;text-decoration:none;align-self:flex-start;background:none;border:0;padding:0;min-height:44px;color:var(--sun);font:400 15px/1 var(--sans);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.card button:hover,.card .go:hover{text-decoration:underline;text-underline-offset:3px}
+@media (min-width:700px){.cards{grid-auto-columns:44%}}
+@media (min-width:1100px){.cards{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible;margin:40px 0 0;padding:0}.card h3{font-size:26px}}
+
+.qa{max-width:760px}
+details{border-top:1px solid var(--line)}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px;font:400 24px/1.2 var(--serif);padding:10px 0}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:400 24px/1 var(--sans);color:var(--sun)}
+details[open] summary::after{content:"\2212"}
+details p{margin:0 0 18px;color:var(--muted);max-width:56ch}
+
+.join{position:relative;overflow:hidden;min-height:78vh;display:grid;align-items:center;border-top:1px solid var(--line)}
+.join>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.72}
+.join::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,var(--bg) 0%,rgba(15,14,21,.35) 45%,var(--bg) 100%)}
+.join .sec{position:relative;z-index:1;width:100%}
+.join h2{font-size:clamp(48px,7vw,104px);line-height:.95}
+.join .lede{color:var(--ink)}
+form{margin-top:28px;max-width:560px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+input[type=email]{flex:1 1 260px;min-height:52px;padding:0 18px;border-radius:999px;border:1px solid rgba(242,237,216,.4);background:rgba(15,14,21,.75);color:var(--ink);font:400 17px/1 var(--sans)}
+input[type=email]::placeholder{color:#8e8d9c}
+input[type=email]:focus{outline:2px solid var(--sun);outline-offset:2px;border-color:transparent}
+input[aria-invalid=true]{border-color:#f0a7a0}
+form .btn{min-height:52px;padding:0 26px;font-size:17px}
+form.busy .btn{opacity:.7;cursor:progress}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.msg{min-height:1.55em;margin:12px 0 0;font-size:16px}
+.msg.ok{color:var(--sun)}
+.msg.err{color:#f6c0ba}
+.small{margin:6px 0 0;font-size:14px;color:var(--muted)}
+form.done .btn{opacity:1;cursor:default}
+.msg:focus{outline:none}
+form.done input{border-color:var(--sun)}
+
+footer{border-top:1px solid var(--line)}
+footer .sec{padding-top:28px;padding-bottom:40px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;font-size:14px;color:var(--muted)}
+footer p{margin:0}
+
+/* Full film */
+dialog{padding:0;border:0;margin:0;width:100%;height:100%;max-width:none;max-height:none;background:var(--bg);color:var(--ink)}
+dialog::backdrop{background:var(--bg)}
+dialog[open]{display:flex;flex-direction:column}
+.dbar{display:flex;align-items:center;gap:10px;padding:8px var(--g);padding-top:max(8px,env(safe-area-inset-top));flex-wrap:wrap}
+.dbar p{margin:0 auto 0 0;font-size:14px;color:var(--muted)}
+#fv{flex:1;min-height:0;width:100%;background:#000}
+.tx{flex:none;border:0;border-top:1px solid var(--line)}
+.tx summary{font:400 15px/1 var(--sans);min-height:44px;padding:0 var(--g)}
+.tx summary::after{font-size:18px}
+.tx div{max-height:38vh;overflow:auto;padding:0 var(--g) 14px}
+.tx p{margin:0 0 10px;max-width:70ch;font-size:15px}
+</style>
+</head>
+<body>
+<div id="sentinel"></div>
+<header class="top" id="top">
+  <a class="brand" href="./" aria-label="Prekko, home"><svg viewBox="11.3 8.5 419.2 110" aria-hidden="true"><g transform="translate(0 4)"><path d="M24 88C15 88 12 77 15 66C18 56 25 49 30 45C26 40 25 32 28 24L30 8L38 15Q44 13 50 15L59 7L60 24C63 32 62 40 58 45C64 49 71 56 73 66C76 77 73 88 64 88Z" fill="#F0F1EE" stroke="#F0F1EE" stroke-width="5" stroke-linejoin="round"/><path d="M62 87.25H74C86 87.25 91 80 89 72C88 66 83 65 81 69" fill="none" stroke="#F0F1EE" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></g><path transform="translate(118 48)" d="M0 0V64M0 20A20 20 0 1 0 40 20A20 20 0 1 0 0 20ZM62 40V18A18 18 0 0 1 80 0H84M104 20H144A20 20 0 1 0 138.14 34.14M166 -22V40M192 0L168 21L195 40M216 -22V40M242 0L218 21L245 40M266 20A20 20 0 1 0 306 20A20 20 0 1 0 266 20Z" fill="none" stroke="#F0F1EE" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  <a class="btn btn--sun" href="#join">Join the waitlist</a>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="h1">
+  <figure class="film" id="film" style="margin:0 auto">
+    <picture>
+      <source media="(orientation: portrait)" srcset="media/hero-poster-tall.webp" width="720" height="1280">
+      <img src="media/hero-poster-wide.webp" width="1280" height="720" fetchpriority="high" alt="A ginger cat crouches on a wooden floor, watching a feather lure held out by a small robot with a fishing rod. Beside them: Meet the Prekko Pawbot. It runs play sessions on its own and stops when your cat loses interest.">
+    </picture>
+    <video id="v" muted playsinline disablepictureinpicture preload="none" tabindex="-1" aria-label="Animation based on our working prototype, seen through your cat's eyes: a feather lure twitches, freezes, darts and is caught between two paws, then the small robot moving it is revealed, with the cat watching. Its words are part of the picture and are repeated below."></video>
+    <noscript><video src="media/hero-wide-720.mp4" autoplay muted playsinline controls></video></noscript>
+    <figcaption class="sr" data-transcript>Words in the film: For a moment, you're a cat. Eyes low, ears up, whiskers forward. Something moved. Then, at the edge of the rug, a feather twitches. Freeze. It stops dead. So do you. Dart. It streaks across the sunlight and vanishes behind the cushion. A long pause. Then the tip of it shows again, testing the air. Pounce. Now. Got it. Both paws, every claw, the whole long afternoon spent in a single leap. Every hunt deserves an ending you can catch. Who's moving the toy? Meet the Prekko Pawbot. It runs play sessions on its own and stops when your cat loses interest. It doesn't play back a loop. Every move is chosen live, for your cat. Working prototype shown; final design may differ.</figcaption>
+    <div class="ctl">
+      <button class="pill" id="snd" type="button"><svg class="i-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="i-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Tap for sound</span></button>
+      <button class="pill" id="pp" type="button" aria-label="Pause"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19.5 12z" fill="currentColor"/></svg></button>
+    </div>
+    <button class="big" id="play" type="button" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17L20 12z" fill="currentColor"/></svg></i><b>Play the film<span id="playmeta">0:26, with sound</span></b></button>
+    <div class="end" id="end" hidden>
+      <a class="btn btn--sun" href="#join" id="endjoin">Join the waitlist</a>
+      <button class="btn btn--ghost" type="button" id="again">Watch again</button>
+      <button class="btn btn--ghost" type="button" data-film="0">Watch the full film <small>2 min</small></button>
+    </div>
+  </figure>
+  <div class="band">
+    <h1 id="h1"><span>Your cat waits all day for something to move.</span> <span id="l2">Now something does.</span></h1>
+    <div>
+      <p class="sub">A small robot that moves a fishing-rod toy like real prey, so your cat gets to hunt, and catch. It learns how your cat likes to play.</p>
+      <div class="cta">
+        <a class="btn btn--sun" href="#join">Join the waitlist</a>
+        <button class="btn btn--ghost" type="button" data-film="0">Watch the full film <small>2 min</small></button>
+      </div>
+      <p class="fine">Animation based on our working prototype. Final design may differ. Real footage coming soon.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="what" aria-labelledby="what-h">
+  <p class="eyebrow">What it does</p>
+  <h2 id="what-h">Real prey never runs in circles. Neither does this.</h2>
+  <p class="lede">Sun on the floor, and nothing has moved since noon. Here is what changes.</p>
+  <ol class="cards" tabindex="0" aria-label="What it does, five cards">
+    <li class="card"><img data-src="media/stills/04-dart-800.webp" data-srcset="media/stills/04-dart-480.webp 480w, media/stills/04-dart-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="The feather lure low over a sunlit wooden floor."><noscript><img src="media/stills/04-dart-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">i</span><h3>It moves like prey.</h3><p>At your cat's pace, never in a loop. Every move is chosen live.</p><button type="button" data-film="38.6">Watch this moment<span class="sr">: It moves like prey</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-src="media/stills/05-pounce-800.webp" data-srcset="media/stills/05-pounce-480.webp 480w, media/stills/05-pounce-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="Two ginger paws pin the feather lure at the end of a pounce."><noscript><img src="media/stills/05-pounce-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">ii</span><h3>Every hunt ends with a catch.</h3><p>Not a red dot that can never be caught. Your cat gets to finish what it starts.</p><button type="button" data-film="55.5">Watch this moment<span class="sr">: Every hunt ends with a catch</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-src="media/stills/06-who-800.webp" data-srcset="media/stills/06-who-480.webp 480w, media/stills/06-who-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="A ginger cat crouches behind the small robot, watching the feather lure it holds out on its fishing rod."><noscript><img src="media/stills/06-who-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">iii</span><h3>It plays on its own.</h3><p>It runs play sessions by itself and stops when your cat loses interest.</p><button type="button" data-film="68.4">Watch this moment<span class="sr">: It plays on its own</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-src="media/stills/08-learns-800.webp" data-srcset="media/stills/08-learns-480.webp 480w, media/stills/08-learns-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="An illustration of the lure's path, drawn as glowing lines. Illustration, not recorded data."><noscript><img src="media/stills/08-learns-800.webp" width="800" height="450" alt=""></noscript><span class="tag" aria-hidden="true">Illustration</span><div><span class="num">iv</span><h3>It learns your cat.</h3><p>It notices which moves your cat chases and which it ignores. Overnight, its multi-layered AI trains on the day's play, so tomorrow it plays more of what your cat loves.</p><button type="button" data-film="86.4">Watch this moment<span class="sr">: It learns your cat</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-src="media/stills/09-your-cats-day-800.webp" data-srcset="media/stills/09-your-cats-day-480.webp 480w, media/stills/09-your-cats-day-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="The room in late sun, the lure resting on the rug."><noscript><img src="media/stills/09-your-cats-day-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">v</span><h3>You're in charge.</h3><p>You control it from your phone: start play, stop it, or let it run its own sessions.</p><a class="go" href="#join">Join the waitlist <span aria-hidden="true">&#9656;</span></a></div></li>
+  </ol>
+</section>
+
+<section class="sec qa" aria-labelledby="qa-h">
+  <p class="eyebrow">Straight answers</p>
+  <h2 id="qa-h" class="sr">Straight answers</h2>
+  <details><summary>What is it, exactly?</summary><p>A small robot that moves a fishing-rod toy like prey. It plays on its own, learns how your cat likes to play, and you control it from your phone.</p></details>
+  <details><summary>Can I buy one?</summary><p>Not yet. The waitlist hears first when orders open.</p></details>
+  <details><summary>Will my cat get bored of it?</summary><p>It never plays a loop. It learns which moves your cat chases and which it walks away from, and keeps changing as your cat does.</p></details>
+  <details><summary>Is the film real footage?</summary><p>It's an animation built from our working prototype's design. Real footage of the prototype playing with cats replaces it soon. Final design may differ.</p></details>
+  <details><summary>What happens when I join?</summary><p>A welcome email, occasional progress news and the launch announcement. Every email has an unsubscribe link.</p></details>
+</section>
+
+<section class="join" id="join" aria-labelledby="join-h">
+  <img data-src="media/stills/10-waitlist-800.webp" data-srcset="media/stills/10-waitlist-800.webp 800w, media/stills/10-waitlist.webp 1200w" sizes="100vw" width="1200" height="676" loading="lazy" decoding="async" alt="">
+  <div class="sec">
+    <h2 id="join-h">The last cat toy you'll ever need.</h2>
+    <p class="lede">Join the waitlist and hear first when orders open.</p>
+    <form id="form" method="post" action="https://api.prekko.com/lead" novalidate>
+      <div class="row">
+        <label class="sr" for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required placeholder="you@example.com" aria-describedby="msg">
+        <button class="btn btn--sun" id="go" type="submit">Join the waitlist</button>
+      </div>
+      <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+      <p class="msg" id="msg" role="status" aria-live="polite" tabindex="-1"></p>
+      <p class="small">Buying it for someone's cat? Join with your own email and we'll tell you first.</p>
+      <p class="small">A welcome email, progress news and the launch announcement. Unsubscribe any time. <a href="privacy.html">Privacy</a></p>
+      <noscript><p class="small">Joining needs JavaScript turned on.</p></noscript>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="sec">
+    <p>The film is an animation based on our working prototype. Final design may differ. Real footage coming soon.</p>
+    <p><a href="privacy.html">Privacy</a> &middot; Prekko</p>
+  </div>
+</footer>
+
+<dialog id="dlg" aria-label="The full film">
+  <div class="dbar">
+    <p>Animation based on our working prototype. Final design may differ. Real footage coming soon.</p>
+    <a class="btn btn--sun" href="#join" id="dskip">Skip to the waitlist</a>
+    <button class="btn btn--ghost" type="button" id="dclose">Close</button>
+  </div>
+  <video id="fv" controls playsinline preload="none" aria-describedby="fvnote"></video>
+  <details class="tx"><summary id="fvnote">Transcript: the film's words, which are part of the picture</summary><div data-transcript>
+    <p>For a moment, you're a cat. Eyes low, ears up, whiskers forward.</p>
+    <p>Hour six. It's the sixth hour of an empty afternoon. The sun has crawled halfway across the floor, and nothing in this house has moved in hours. Your world sits a hand's width off the ground. You've been waiting all day for something, anything, to happen.</p>
+    <p>Something moved. Then, at the edge of the rug, a feather twitches. Your pupils swell until the whole room goes soft and only that one point stays sharp.</p>
+    <p>Freeze. It stops dead. So do you. Every muscle loads like a spring, because anything that holds this still is hiding something.</p>
+    <p>Dart. It streaks across the sunlight and vanishes behind the cushion. A long pause. Then the tip of it shows again, testing the air. Real prey never runs in circles. It runs, it hides, and it checks whether you're still watching. So does this.</p>
+    <p>Pounce. Now. Got it. Both paws, every claw, the whole long afternoon spent in a single leap. Every hunt deserves an ending you can catch.</p>
+    <p>Who's moving the toy? Meet the Prekko Pawbot. It runs play sessions on its own and stops when your cat loses interest. It doesn't play back a loop. Every move is chosen live, for your cat. Working prototype shown; final design may differ.</p>
+    <p>It learns your cat. Every session teaches it something: which moves make your cat crouch and chase, and which ones they walk away from. (Illustration of how it learns, not recorded data.) Overnight, it trains on the day's play and comes back sharper. It learns how your cat plays and gets better at playing with your cat over time.</p>
+    <p>The last cat toy you'll ever need. Prekko Pawbot is still a working prototype, and its price and ship date are not set yet. People on the list get launch updates by email. Working prototype shown; final design may differ.</p>
+  </div></details>
+</dialog>
+
+<script>
+(function () {
+  var d = document, w = window, n = navigator, c = n.connection || {};
+  var $ = function (id) { return d.getElementById(id); };
+  var mm = function (q) { return !!(w.matchMedia && w.matchMedia(q).matches); };
+  var v = $("v"), film = $("film"), l2 = $("l2"), snd = $("snd"), pp = $("pp"), big = $("play"), end = $("end");
+  var slow = /2g/.test(c.effectiveType || "");
+  var calm = mm("(prefers-reduced-motion: reduce)") || c.saveData === true || slow;
+  var av1 = false, userPaused = false, autoPaused = false, started = false, inView = true;
+  var TWITCH = 3.0; // hero time of the first twitch: the headline's second line arrives with it
+  var HERO_MB = "2.4"; // the 720p hero, for the reduced-motion Play button
+
+  // Which file: tall on portrait screens; 1080p only for screens with the pixels for it, on capable, unmetered devices.
+  function pick(kind) {
+    var tall = mm("(orientation: portrait)"), px = w.innerWidth * (w.devicePixelRatio || 1);
+    // Device pixels: a 1280x720 laptop (the commonest cheap screen) and every phone get 720p; tablets and big screens 1080p
+    var hi = (tall ? px >= 1400 : px >= 1600) && (n.hardwareConcurrency || 2) > 4 && !c.saveData && !/2g|3g/.test(c.effectiveType || "");
+    return "media/" + kind + "-" + (tall ? "tall" : "wide") + "-" + (hi ? 1080 : 720);
+  }
+  // WebM (AV1) first only where the device decodes it efficiently; H.264 otherwise. #t= starts mid-film.
+  function setSrc(el, base, t) {
+    var list = [[".webm", 'video/webm; codecs="av01.0.08M.08, opus"'], [".mp4", 'video/mp4; codecs="avc1.640028, mp4a.40.2"']];
+    if (!av1) list.reverse();
+    el.textContent = "";
+    list.forEach(function (x) {
+      var s = d.createElement("source");
+      s.src = base + x[0] + (t ? "#t=" + t : "");
+      s.type = x[1];
+      el.appendChild(s);
+    });
+    el.lastChild.addEventListener("error", function () { if (el === v) { film.classList.add("nov"); big.hidden = true; reveal(); } });
+    el.load();
+  }
+  function reveal() { l2.classList.remove("wait"); }
+  function play(el) {
+    var p = el.play();
+    if (p && p.catch) p.catch(function () { if (el === v && v.paused && !v.ended) idle(); });
+  }
+  function idle() { film.classList.add("idle"); big.hidden = false; reveal(); stills(); }
+  // Card and waitlist images stay off the network until the hero is moving (or will not move)
+  var stilled = false;
+  function stills() {
+    if (stilled) return; stilled = true;
+    [].forEach.call(d.querySelectorAll("img[data-src]"), function (im) {
+      if (im.dataset.srcset) im.srcset = im.dataset.srcset;
+      im.src = im.dataset.src;
+    });
+  }
+  function syncPP() {
+    var paused = v.paused || v.ended;
+    pp.classList.toggle("paused", paused);
+    pp.setAttribute("aria-label", paused ? "Play" : "Pause");
+  }
+  function syncSnd() {
+    // The name says what the button does; no pressed state, so it is never read backwards
+    snd.classList.toggle("on", !v.muted);
+    snd.lastChild.textContent = v.muted ? "Tap for sound" : "Mute";
+  }
+
+  v.addEventListener("playing", function () {
+    started = true; big.hidden = true; end.hidden = true;
+    film.classList.add("on"); film.classList.remove("idle", "ended"); syncPP();
+    setTimeout(stills, 1500);
+  });
+  v.addEventListener("pause", syncPP);
+  v.addEventListener("timeupdate", function tu() {
+    if (v.currentTime >= TWITCH) { reveal(); v.removeEventListener("timeupdate", tu); }
+  });
+  v.addEventListener("ended", function () {
+    var kb = film.contains(d.activeElement) && !end.contains(d.activeElement);
+    film.classList.add("ended"); end.hidden = false; syncPP();
+    // Pause and Sound vanish at the end: a keyboard user on them lands on the end screen, which then stays put
+    if (kb) { $("endjoin").focus(); return; }
+    // The film drops into the page, unless the visitor has already moved on
+    if (w.scrollY < 40 && !d.hidden) setTimeout(function () {
+      if (w.scrollY < 40 && !$("dlg").open && !film.contains(d.activeElement)) $("what").scrollIntoView({ behavior: calm ? "auto" : "smooth" });
+    }, 1400);
+  });
+  v.addEventListener("volumechange", syncSnd);
+
+  snd.onclick = function () {
+    v.muted = !v.muted;
+    if (!v.muted && v.paused && !v.ended) { userPaused = false; play(v); }
+  };
+  pp.onclick = function () {
+    if (v.paused || v.ended) { userPaused = false; play(v); } else { userPaused = true; v.pause(); }
+  };
+  v.onclick = function () { if (v.muted) snd.onclick(); else pp.onclick(); };
+  big.onclick = function () {
+    big.hidden = true; film.classList.remove("idle");
+    if (!v.firstChild) setSrc(v, pick("hero"));
+    v.muted = false; userPaused = false; play(v);
+  };
+  $("again").onclick = function () { v.currentTime = 0; userPaused = false; play(v); };
+
+  // Pause when the film leaves the screen or the tab is hidden; pick up again on return.
+  function away() { if (!v.paused && !v.ended) { autoPaused = true; v.pause(); } }
+  function back() { if (autoPaused && !userPaused && !v.ended && inView && !d.hidden && !$("dlg").open) { autoPaused = false; play(v); } }
+  if ("IntersectionObserver" in w) {
+    new IntersectionObserver(function (e) { inView = e[0].isIntersecting; inView ? back() : away(); }, { threshold: 0.2 }).observe(film);
+    new IntersectionObserver(function (e) { $("top").classList.toggle("solid", !e[0].isIntersecting); }).observe($("sentinel"));
+  } else $("top").classList.add("solid");
+  d.addEventListener("visibilitychange", function () { d.hidden ? away() : back(); });
+
+  // Rotating the phone swaps to the other framing at the same moment.
+  var mq = w.matchMedia && w.matchMedia("(orientation: portrait)");
+  if (mq) (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function () {
+    if (!v.firstChild) return;
+    var t = v.currentTime, was = !v.paused;
+    setSrc(v, pick("hero"), t > 0.1 ? t.toFixed(2) : 0);
+    if (was) play(v);
+  });
+
+  if (calm) {
+    $("playmeta").textContent = "0:26, about " + HERO_MB + " MB";
+    idle();
+  } else {
+    l2.classList.add("wait");
+    var once = function () { once = function () {}; setSrc(v, pick("hero")); v.preload = "auto"; play(v); };
+    var mc = n.mediaCapabilities;
+    setTimeout(function () { once(); }, 350);
+    if (mc && mc.decodingInfo) mc.decodingInfo({ type: "file", video: { contentType: 'video/webm; codecs="av01.0.08M.08"', width: 1920, height: 1080, bitrate: 1400000, framerate: 30 } })
+      .then(function (r) { av1 = !!(r.supported && r.powerEfficient); }, function () {})
+      .then(function () { once(); });
+    else once();
+    // A browser that neither plays nor refuses (Low Power Mode, data saver) gets the Play button
+    setTimeout(function () { if (!started && v.paused) idle(); }, 4000);
+    setTimeout(stills, 6000);
+  }
+  syncSnd();
+  setTimeout(function () { snd.classList.add("nudge"); }, 4000);
+
+  // The full film: loads only on tap, so it starts with sound.
+  var dlg = $("dlg"), fv = $("fv"), heroAt = -1;
+  function openFilm(t) {
+    if (!dlg.showModal) { location.href = pick("film") + ".mp4" + (t ? "#t=" + t : ""); return; }
+    if (!v.paused) { autoPaused = false; userPaused = true; v.pause(); }
+    // A hero still downloading would fight the film for the line: let go of it, and pick it up again on close
+    var b = v.buffered;
+    if (v.firstChild && !v.ended && !(b.length && v.duration && b.end(b.length - 1) >= v.duration - 0.5)) {
+      heroAt = v.currentTime; v.textContent = ""; v.removeAttribute("src"); v.load();
+    }
+    setSrc(fv, pick("film"), t);
+    fv.muted = false;
+    dlg.showModal();
+    play(fv);
+  }
+  d.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-film]");
+    if (b) openFilm(+b.getAttribute("data-film") || 0);
+  });
+  $("dclose").onclick = function () { dlg.close(); };
+  $("dskip").onclick = function () { dlg.close(); setTimeout(function () { $("email").focus({ preventScroll: true }); }, 400); };
+  dlg.addEventListener("close", function () {
+    fv.pause();
+    if (heroAt >= 0) { v.preload = "metadata"; setSrc(v, pick("hero"), heroAt > 0.1 ? heroAt.toFixed(2) : 0); heroAt = -1; }
+  });
+  // The film ends on the waitlist card: go straight to the form
+  fv.addEventListener("ended", function () { $("dskip").onclick(); $("join").scrollIntoView(); });
+
+  // The waitlist: JSON to the Worker. The address stays in the field until it is safely on the list.
+  var WAITLIST_ENDPOINT = "https://api.prekko.com/lead";
+  var form = $("form"), email = $("email"), go = $("go"), msg = $("msg");
+  function say(text, cls) { msg.textContent = text; msg.className = "msg " + (cls || ""); }
+  try { var kept = sessionStorage.getItem("prekko-email"); if (kept && !email.value) email.value = kept; } catch (e) {}
+  email.addEventListener("input", function () {
+    email.removeAttribute("aria-invalid");
+    try { sessionStorage.setItem("prekko-email", email.value); } catch (e) {}
+  });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (form.classList.contains("busy") || form.classList.contains("done")) return;
+    var value = email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      email.setAttribute("aria-invalid", "true");
+      say(value ? "That address doesn't look complete. Check it and try again." : "Type your email address first.", "err");
+      email.focus();
+      return;
+    }
+    if (n.onLine === false) { say("You seem to be offline. Your address is still here; try again when you're connected.", "err"); email.focus(); return; }
+    var utm = {};
+    try { new URLSearchParams(location.search).forEach(function (val, k) { if (k.indexOf("utm_") === 0 && val) utm[k] = val.slice(0, 200); }); } catch (x) {}
+    form.classList.add("busy"); go.setAttribute("aria-disabled", "true"); go.textContent = "Joining…"; say("");
+    var ctl = w.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
+    fetch(WAITLIST_ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email: value, source: "film", utm: utm, website: $("website").value }),
+      signal: ctl ? ctl.signal : undefined
+    }).then(function (r) {
+      if (r.ok) {
+        form.classList.add("done"); email.readOnly = true; go.textContent = "You're on the list";
+        say("You're on the list as " + value + ". We'll write when there's news.", "ok");
+        msg.focus();
+        try { sessionStorage.removeItem("prekko-email"); } catch (x) {}
+        return true;
+      }
+      if (r.status === 429) say("Lots of sign-ups at once. Your address is still here; try again in a minute.", "err");
+      else if (r.status === 400 || r.status === 422) { email.setAttribute("aria-invalid", "true"); say("That address didn't go through. Check it and try again.", "err"); }
+      else say("We couldn't reach the list just now. Your address is still here; try again in a moment.", "err");
+    }, function () {
+      say("We couldn't reach the list just now. Your address is still here; try again in a moment.", "err");
+    }).then(function (ok) {
+      clearTimeout(timer); form.classList.remove("busy");
+      if (!ok) { go.removeAttribute("aria-disabled"); go.textContent = "Join the waitlist"; email.focus(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
