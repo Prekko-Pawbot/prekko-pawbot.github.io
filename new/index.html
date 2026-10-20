@@ -17,9 +17,9 @@
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon-180.png">
-<link rel="preload" as="image" href="media/hero-poster-wide.webp" media="(orientation: landscape)" fetchpriority="high">
-<link rel="preload" as="image" href="media/hero-poster-tall.webp" media="(orientation: portrait)" fetchpriority="high">
-<noscript><style>.ctl{display:none}</style></noscript>
+<link rel="preload" as="image" href="media/poster-card-wide.webp" media="(orientation: landscape)" fetchpriority="high">
+<link rel="preload" as="image" href="media/poster-card-tall.webp" media="(orientation: portrait)" fetchpriority="high">
+<noscript><style>.ctl,.prog,#snd{display:none}</style></noscript>
 <link rel="preload" as="font" type="font/woff2" href="fonts/instrument-serif-400.woff2" crossorigin>
 <style>
 @font-face{font-family:"Instrument Serif";font-weight:400;font-display:swap;src:url(fonts/instrument-serif-400.woff2) format("woff2")}
@@ -53,7 +53,7 @@ h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;margin:0
 .btn--sun:hover{background:#f6e7ad}
 .btn--ghost{background:transparent;color:var(--ink);border-color:rgba(242,237,216,.38)}
 .btn--ghost:hover{border-color:var(--ink)}
-.btn small{font-size:14px;color:var(--muted)}
+.btn svg{width:20px;height:20px;flex:none}
 
 /* Header: fixed, transparent on the film, solid once you scroll */
 .top{position:fixed;inset:0 0 auto;z-index:5;height:var(--hdr);display:flex;align-items:center;justify-content:space-between;padding:0 var(--g);padding-top:env(safe-area-inset-top);transition:background-color .3s}
@@ -63,37 +63,34 @@ h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;margin:0
 .brand svg{display:block;width:104px;height:27px}
 #sentinel{position:absolute;top:0;height:8px;width:1px}
 
-/* The film */
-.hero{position:relative}
+/* The film: the whole film, muted, at its own pace */
 .film{position:relative;margin:0 auto;background:var(--bg);aspect-ratio:16/9;
   width:min(100%,calc((100vh - var(--band)) * 16 / 9));width:min(100%,calc((100svh - var(--band)) * 16 / 9))}
 .film picture{position:absolute;inset:0}
 .film img,.film>video,.film>noscript>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .film>video{opacity:0}
-@media (prefers-reduced-motion:no-preference){.film>video{transition:opacity .6s ease-out}}
 .film.on>video{opacity:1}
-/* The end screen darkens only the lower part, so the cat and the machine stay bright behind the buttons */
-.film.ended .end{background:linear-gradient(180deg,rgba(15,14,21,0) 45%,rgba(15,14,21,.82) 100%)}
-.ctl{position:absolute;right:12px;bottom:12px;display:flex;gap:8px}
-.pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;padding:0 14px;border-radius:999px;border:1px solid rgba(242,237,216,.3);background:rgba(15,14,21,.72);color:var(--ink);font:400 15px/1 var(--sans);cursor:pointer}
+/* The film fades to black at its end; the page fades its closing card back up under the end buttons */
+.film.ended>video{opacity:0;transition:none}
+.film.ended.hold>video{opacity:1;transition:opacity .9s ease-out}
+.prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(242,237,216,.14);pointer-events:none}
+.prog i{display:block;height:100%;background:var(--sun);transform-origin:0 50%;transform:scaleX(0)}
+.ctl{position:absolute;right:10px;bottom:12px}
+.pill{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0;border-radius:999px;border:1px solid rgba(242,237,216,.3);background:rgba(15,14,21,.6);color:var(--ink);cursor:pointer}
 .pill:hover{border-color:var(--ink)}
-.pill svg{width:18px;height:18px;flex:none}
-#pp{padding:0;justify-content:center}
+.pill svg{width:18px;height:18px}
 #pp .i-play,#pp.paused .i-pause{display:none}
 #pp.paused .i-play{display:block}
-#snd .i-on,#snd.on .i-off{display:none}
-#snd.on .i-on{display:block}
-#snd:not(.on){border-color:var(--sun)}
-@media (prefers-reduced-motion:no-preference){#snd.nudge{animation:nudge 1.1s ease-out 1}}
-@keyframes nudge{0%{box-shadow:0 0 0 0 rgba(241,220,140,.7)}100%{box-shadow:0 0 0 14px rgba(241,220,140,0)}}
-.film.ended .ctl,.film.idle .ctl,.film.nov .ctl{display:none}
-.big{position:absolute;z-index:1;left:50%;top:82%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:14px;min-height:64px;padding:0 26px 0 12px;border-radius:999px;border:0;background:var(--sun);color:#16151c;font:400 18px/1.2 var(--sans);cursor:pointer;text-align:left}
+.film.ended .prog,.film.ended .ctl,.film.idle .ctl,.film.nov .ctl,.film.idle .prog{display:none}
+.big{position:absolute;z-index:1;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:14px;min-height:64px;padding:0 26px 0 12px;border-radius:999px;border:0;background:var(--sun);color:#16151c;font:400 18px/1.2 var(--sans);cursor:pointer;text-align:left}
 .big b{font-weight:400;white-space:nowrap}
 .big span{display:block;font-size:14px;opacity:.75}
 .big i{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#16151c;color:var(--sun)}
 .big svg{width:18px;height:18px;margin-left:3px}
-.end{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;align-content:end;gap:12px;padding:16px 16px 7%}
+.end{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;align-content:end;gap:12px;padding:16px 16px 6%;background:linear-gradient(180deg,rgba(15,14,21,0) 68%,rgba(15,14,21,.85) 100%)}
 .end .btn--ghost{background:rgba(15,14,21,.6)}
+@media (prefers-reduced-motion:no-preference){.film>video{transition:opacity .6s ease-out}.end{animation:in .9s ease-out both}}
+@keyframes in{from{opacity:0}}
 [hidden]{display:none!important}
 
 /* Promise band: under the picture, never over it */
@@ -103,24 +100,23 @@ h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;margin:0
 h1{font-size:clamp(28px,2.4vw,44px);line-height:1.08;text-wrap:balance;margin-bottom:12px}
 @media (orientation:landscape) and (min-width:720px){h1{margin-bottom:0}}
 h1 span{display:block}
-#l2{color:var(--sun);transition:opacity .5s ease-out}
-#l2.wait{opacity:0}
+h1 span+span{color:var(--sun)}
 .sub{margin:0 0 14px;font-size:16px;line-height:1.5;color:var(--ink)}
 .cta{display:flex;flex-wrap:wrap;gap:10px}
 .cta .btn{flex:0 1 auto}
+#snd{min-height:48px;padding:0 22px 0 16px;font-size:17px}
 @media (orientation:portrait){
-  .film{aspect-ratio:9/16;width:min(100%,calc((100vh - 196px) * 9 / 16));width:min(100%,calc((100svh - 196px) * 9 / 16))}
-  /* On a phone the line that says what it is comes first, right under the film */
+  .film{aspect-ratio:1/2;width:min(100%,calc((100vh - 196px) / 2));width:min(100%,calc((100svh - 196px) / 2))}
+  /* On a phone the sound button sits right under the film, then the line that says what it is */
   .band{display:flex;flex-direction:column;padding-top:12px;max-width:560px}
   .band>div{display:contents}
+  .cta{order:-2;margin-bottom:12px}
   .sub{order:-1;margin-bottom:12px}
   .fine{font-size:12.5px}
   h1{font-size:clamp(26px,7.3vw,40px)}
   .cta .btn{flex:1 1 auto}
-  .big{top:88%}
-  /* The tall film's words fill its lower half: under the end buttons and the Play button they give way to the dark */
-  .film.ended .end{background:linear-gradient(180deg,rgba(15,14,21,0) 50%,rgba(15,14,21,.93) 76%)}
-  .film.idle::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(15,14,21,0) 52%,rgba(15,14,21,.9) 78%)}
+  .end{background:linear-gradient(180deg,rgba(15,14,21,0) 76%,rgba(15,14,21,.9) 94%)}
+  .big{top:80%}
 }
 @media (orientation:landscape) and (max-height:520px){:root{--band:0px}}
 
@@ -138,10 +134,10 @@ h2{font-size:clamp(32px,4vw,56px);line-height:1.05;max-width:20ch;text-wrap:bala
 .num{font:400 13px/1 var(--sans);letter-spacing:.16em;color:var(--sun);font-variant:small-caps}
 .card h3{font-size:28px;line-height:1.05;margin:8px 0 8px}
 .card p{margin:0 0 14px;color:var(--muted);font-size:16px;line-height:1.5}
-.card button,.card .go{margin-top:auto;text-decoration:none;align-self:flex-start;background:none;border:0;padding:0;min-height:44px;color:var(--sun);font:400 15px/1 var(--sans);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-.card button:hover,.card .go:hover{text-decoration:underline;text-underline-offset:3px}
+.card button{margin-top:auto;align-self:flex-start;background:none;border:0;padding:0;min-height:44px;color:var(--sun);font:400 15px/1 var(--sans);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.card button:hover{text-decoration:underline;text-underline-offset:3px}
 @media (min-width:700px){.cards{grid-auto-columns:44%}}
-@media (min-width:1100px){.cards{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible;margin:40px 0 0;padding:0}.card h3{font-size:26px}}
+@media (min-width:1100px){.cards{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;margin:40px 0 0;padding:0;gap:18px}}
 
 .qa{max-width:760px}
 details{border-top:1px solid var(--line)}
@@ -179,18 +175,17 @@ footer{border-top:1px solid var(--line)}
 footer .sec{padding-top:28px;padding-bottom:40px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;font-size:14px;color:var(--muted)}
 footer p{margin:0}
 
-/* Full film */
-dialog{padding:0;border:0;margin:0;width:100%;height:100%;max-width:none;max-height:none;background:var(--bg);color:var(--ink)}
+/* Theater: the same film, from the same moment, with sound */
+dialog{padding:0;border:0;margin:0;width:100%;height:100%;max-width:none;max-height:none;background:#000;color:var(--ink)}
 dialog::backdrop{background:var(--bg)}
 dialog[open]{display:flex;flex-direction:column}
-.dbar{display:flex;align-items:center;gap:10px;padding:8px var(--g);padding-top:max(8px,env(safe-area-inset-top));flex-wrap:wrap}
+.dbar{display:flex;align-items:center;gap:10px;padding:8px var(--g);padding-top:max(8px,env(safe-area-inset-top));flex-wrap:wrap;background:var(--bg)}
 .dbar p{margin:0 auto 0 0;font-size:14px;color:var(--muted)}
-#fv{flex:1;min-height:0;width:100%;background:#000}
-.tx{flex:none;border:0;border-top:1px solid var(--line)}
-.tx summary{font:400 15px/1 var(--sans);min-height:44px;padding:0 var(--g)}
-.tx summary::after{font-size:18px}
-.tx div{max-height:38vh;overflow:auto;padding:0 var(--g) 14px}
-.tx p{margin:0 0 10px;max-width:70ch;font-size:15px}
+#dclose{margin-left:auto}
+.dbar p+.btn{margin-left:0}
+@media (max-width:640px){.dbar p{display:none}.dbar .btn{flex:1 1 auto;padding:0 12px}}
+#stage{flex:1;min-height:0;position:relative}
+#stage>video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:1;background:#000}
 </style>
 </head>
 <body>
@@ -204,30 +199,26 @@ dialog[open]{display:flex;flex-direction:column}
 <section class="hero" aria-labelledby="h1">
   <figure class="film" id="film" style="margin:0 auto">
     <picture>
-      <source media="(orientation: portrait)" srcset="media/hero-poster-tall.webp" width="720" height="1280">
-      <img src="media/hero-poster-wide.webp" width="1280" height="720" fetchpriority="high" alt="A ginger cat crouches on a wooden floor, watching a feather lure held out by a small robot with a fishing rod. Beside them: Meet the Prekko Pawbot. It runs play sessions on its own and stops when your cat loses interest.">
+      <source media="(orientation: portrait)" srcset="media/poster-card-tall.webp" width="1080" height="2160">
+      <img src="media/poster-card-wide.webp" width="1920" height="1080" fetchpriority="high" alt="For a moment, you're a cat. Eyes low, ears up, whiskers forward.">
     </picture>
-    <video id="v" muted playsinline disablepictureinpicture preload="none" tabindex="-1" aria-label="Animation based on our working prototype, seen through your cat's eyes: a feather lure twitches, freezes, darts and is caught between two paws, then the small robot moving it is revealed, with the cat watching. Its words are part of the picture and are repeated below."></video>
-    <noscript><video src="media/hero-wide-720.mp4" autoplay muted playsinline controls></video></noscript>
-    <figcaption class="sr" data-transcript>Words in the film: For a moment, you're a cat. Eyes low, ears up, whiskers forward. Something moved. Then, at the edge of the rug, a feather twitches. Freeze. It stops dead. So do you. Dart. It streaks across the sunlight and vanishes behind the cushion. A long pause. Then the tip of it shows again, testing the air. Pounce. Now. Got it. Both paws, every claw, the whole long afternoon spent in a single leap. Every hunt deserves an ending you can catch. Who's moving the toy? Meet the Prekko Pawbot. It runs play sessions on its own and stops when your cat loses interest. It doesn't play back a loop. Every move is chosen live, for your cat. Working prototype shown; final design may differ.</figcaption>
-    <div class="ctl">
-      <button class="pill" id="snd" type="button"><svg class="i-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="i-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Tap for sound</span></button>
-      <button class="pill" id="pp" type="button" aria-label="Pause"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19.5 12z" fill="currentColor"/></svg></button>
-    </div>
-    <button class="big" id="play" type="button" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17L20 12z" fill="currentColor"/></svg></i><b>Play the film<span id="playmeta">0:26, with sound</span></b></button>
+    <video id="v" muted playsinline disablepictureinpicture preload="none" tabindex="-1" aria-label="The film, an animation based on our working prototype" aria-describedby="words"></video>
+    <noscript><video src="media/film-wide-720.mp4" poster="media/poster-card-wide.webp" controls playsinline></video></noscript>
+    <div class="prog" aria-hidden="true"><i id="prog"></i></div>
+    <div class="ctl"><button class="pill" id="pp" type="button" aria-label="Pause"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19.5 12z" fill="currentColor"/></svg></button></div>
+    <button class="big" id="play" type="button" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17L20 12z" fill="currentColor"/></svg></i><b>Play the film<span>2½ minutes</span></b></button>
     <div class="end" id="end" hidden>
       <a class="btn btn--sun" href="#join" id="endjoin">Join the waitlist</a>
       <button class="btn btn--ghost" type="button" id="again">Watch again</button>
-      <button class="btn btn--ghost" type="button" data-film="0">Watch the full film <small>2 min</small></button>
     </div>
   </figure>
   <div class="band">
-    <h1 id="h1"><span>Your cat waits all day for something to move.</span> <span id="l2">Now something does.</span></h1>
+    <h1 id="h1"><span>Your cat waits all day for something to move.</span> <span>Now something does.</span></h1>
     <div>
       <p class="sub">A small robot that moves a fishing-rod toy like real prey, so your cat gets to hunt, and catch. It learns how your cat likes to play.</p>
       <div class="cta">
-        <a class="btn btn--sun" href="#join">Join the waitlist</a>
-        <button class="btn btn--ghost" type="button" data-film="0">Watch the full film <small>2 min</small></button>
+        <button class="btn btn--sun" type="button" id="snd"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Enable sound</button>
+        <a class="btn btn--ghost" href="#join">Skip to the waitlist</a>
       </div>
       <p class="fine">Animation based on our working prototype. Final design may differ. Real footage coming soon.</p>
     </div>
@@ -238,12 +229,13 @@ dialog[open]{display:flex;flex-direction:column}
   <p class="eyebrow">What it does</p>
   <h2 id="what-h">Real prey never runs in circles. Neither does this.</h2>
   <p class="lede">Sun on the floor, and nothing has moved since noon. Here is what changes.</p>
-  <ol class="cards" tabindex="0" aria-label="What it does, five cards">
-    <li class="card"><img data-src="media/stills/04-dart-800.webp" data-srcset="media/stills/04-dart-480.webp 480w, media/stills/04-dart-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="The feather lure low over a sunlit wooden floor."><noscript><img src="media/stills/04-dart-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">i</span><h3>It moves like prey.</h3><p>At your cat's pace, never in a loop. Every move is chosen live.</p><button type="button" data-film="38.6">Watch this moment<span class="sr">: It moves like prey</span> <span aria-hidden="true">&#9656;</span></button></div></li>
-    <li class="card"><img data-src="media/stills/05-pounce-800.webp" data-srcset="media/stills/05-pounce-480.webp 480w, media/stills/05-pounce-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="Two ginger paws pin the feather lure at the end of a pounce."><noscript><img src="media/stills/05-pounce-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">ii</span><h3>Every hunt ends with a catch.</h3><p>Not a red dot that can never be caught. Your cat gets to finish what it starts.</p><button type="button" data-film="55.5">Watch this moment<span class="sr">: Every hunt ends with a catch</span> <span aria-hidden="true">&#9656;</span></button></div></li>
-    <li class="card"><img data-src="media/stills/06-who-800.webp" data-srcset="media/stills/06-who-480.webp 480w, media/stills/06-who-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="A ginger cat crouches behind the small robot, watching the feather lure it holds out on its fishing rod."><noscript><img src="media/stills/06-who-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">iii</span><h3>It plays on its own.</h3><p>It runs play sessions by itself and stops when your cat loses interest.</p><button type="button" data-film="68.4">Watch this moment<span class="sr">: It plays on its own</span> <span aria-hidden="true">&#9656;</span></button></div></li>
-    <li class="card"><img data-src="media/stills/08-learns-800.webp" data-srcset="media/stills/08-learns-480.webp 480w, media/stills/08-learns-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="An illustration of the lure's path, drawn as glowing lines. Illustration, not recorded data."><noscript><img src="media/stills/08-learns-800.webp" width="800" height="450" alt=""></noscript><span class="tag" aria-hidden="true">Illustration</span><div><span class="num">iv</span><h3>It learns your cat.</h3><p>It notices which moves your cat chases and which it ignores. Overnight, its multi-layered AI trains on the day's play, so tomorrow it plays more of what your cat loves.</p><button type="button" data-film="86.4">Watch this moment<span class="sr">: It learns your cat</span> <span aria-hidden="true">&#9656;</span></button></div></li>
-    <li class="card"><img data-src="media/stills/09-your-cats-day-800.webp" data-srcset="media/stills/09-your-cats-day-480.webp 480w, media/stills/09-your-cats-day-800.webp 800w" sizes="(min-width: 1100px) 230px, (min-width: 700px) 44vw, 86vw" width="800" height="450" loading="lazy" decoding="async" alt="The room in late sun, the lure resting on the rug."><noscript><img src="media/stills/09-your-cats-day-800.webp" width="800" height="450" alt=""></noscript><div><span class="num">v</span><h3>You're in charge.</h3><p>You control it from your phone: start play, stop it, or let it run its own sessions.</p><a class="go" href="#join">Join the waitlist <span aria-hidden="true">&#9656;</span></a></div></li>
+  <ol class="cards" tabindex="0" aria-label="What it does, six cards">
+    <li class="card"><img data-s="04-dart" width="800" height="450" loading="lazy" decoding="async" alt="The feather lure low over a sunlit wooden floor."><div><span class="num">i</span><h3>It moves like prey.</h3><p>At your cat's pace, never in a loop. Every move is chosen live.</p><button type="button" data-film="38.9">Watch this moment<span class="sr">: It moves like prey</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-s="05-pounce" width="800" height="450" loading="lazy" decoding="async" alt="Two ginger paws pin the feather lure at the end of a pounce."><div><span class="num">ii</span><h3>Every hunt ends with a catch.</h3><p>Not a red dot that can never be caught. Your cat gets to finish what it starts.</p><button type="button" data-film="55.8">Watch this moment<span class="sr">: Every hunt ends with a catch</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-s="06-who" width="800" height="450" loading="lazy" decoding="async" alt="A ginger cat crouches behind the small robot, watching the feather lure it holds out on its fishing rod."><div><span class="num">iii</span><h3>It plays on its own.</h3><p>It runs play sessions by itself and stops when your cat loses interest.</p><button type="button" data-film="68.6">Watch this moment<span class="sr">: It plays on its own</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-s="07-how-it-works" width="800" height="450" loading="lazy" decoding="async" alt="An illustration of the AI at work: glowing lines trace the cat, a ring of light rises from the robot, and panels of small tiles and dials stand for the many choices it weighs."><span class="tag" aria-hidden="true">Illustration</span><div><span class="num">iv</span><h3>Multi-layered AI.</h3><p>Several AI systems, working as one: they read your cat, choose the next move and shape it as it happens. Endless variations, no preset loops.</p><button type="button" data-film="87.4">Watch this moment<span class="sr">: Multi-layered AI</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-s="08-learns" width="800" height="450" loading="lazy" decoding="async" alt="An illustration of the lure's path, drawn as glowing lines. Illustration, not recorded data."><span class="tag" aria-hidden="true">Illustration</span><div><span class="num">v</span><h3>It learns your cat.</h3><p>It notices which moves your cat chases and which it ignores. Overnight, it trains on the day's play, so tomorrow it plays more of what your cat loves.</p><button type="button" data-film="112.3">Watch this moment<span class="sr">: It learns your cat</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-s="09-your-cats-day" width="800" height="450" loading="lazy" decoding="async" alt="The room in late sun, the lure resting on the rug."><div><span class="num">vi</span><h3>You're in charge.</h3><p>You control it from your phone: start play, stop it, or let it run its own sessions.</p><button type="button" data-film="133.5" data-tall="133.0">Watch this moment<span class="sr">: You're in charge</span> <span aria-hidden="true">&#9656;</span></button></div></li>
   </ol>
 </section>
 
@@ -255,10 +247,23 @@ dialog[open]{display:flex;flex-direction:column}
   <details><summary>Will my cat get bored of it?</summary><p>It never plays a loop. It learns which moves your cat chases and which it walks away from, and keeps changing as your cat does.</p></details>
   <details><summary>Is the film real footage?</summary><p>It's an animation built from our working prototype's design. Real footage of the prototype playing with cats replaces it soon. Final design may differ.</p></details>
   <details><summary>What happens when I join?</summary><p>A welcome email, occasional progress news and the launch announcement. Every email has an unsubscribe link.</p></details>
+  <details><summary>Read the film's words</summary><div id="words" data-transcript>
+    <p>For a moment, you're a cat. Eyes low, ears up, whiskers forward.</p>
+    <p>Hour six. It's the sixth hour of an empty afternoon. The sun has crawled halfway across the floor, and nothing in this house has moved in hours. Your world sits a hand's width off the ground. You've been waiting all day for something, anything, to happen.</p>
+    <p>Something moved. Then, at the edge of the rug, a feather twitches. Your pupils swell until the whole room goes soft and only that one point stays sharp.</p>
+    <p>Freeze. It stops dead. So do you. Every muscle loads like a spring, because anything that holds this still is hiding something.</p>
+    <p>Dart. It streaks across the sunlight and vanishes behind the cushion. A long pause. Then the tip of it shows again, testing the air. Real prey never runs in circles. It runs, it hides, and it checks whether you're still watching. So does this.</p>
+    <p>Pounce. Now. Got it. Both paws, every claw, the whole long afternoon spent in a single leap. Every hunt deserves an ending you can catch.</p>
+    <p>Who's moving the toy? Meet the Prekko Pawbot. It runs play sessions on its own and stops when your cat loses interest. It doesn't play back a loop. Every move is chosen live, for your cat. Working prototype shown; final design may differ.</p>
+    <p>Multi-layered AI. Several AI systems, working as one. See: It reads your cat in real time: where they are, how fast they move, where they look, how low they crouch and how interested they are. (Illustration, not the real model.) Choose: A strategy layer reads your cat's mood and picks the moves your cat chases. Move: A motion layer fine-tunes every move as it happens. Endless variations. No preset loops.</p>
+    <p>It learns your cat. Every session teaches it something: which moves make your cat crouch and chase, and which ones they walk away from. (Illustration of how it learns, not recorded data.) Overnight, it trains on the day's play and comes back sharper. It learns how your cat plays and gets better at playing with your cat over time.</p>
+    <p>Your cat's day. You control it from your phone. A planned tracker in the app would keep the story of each day: when the hunts happened, how long they lasted, and the quiet stretches in between. (Planned feature, not in the prototype shown; example numbers.)</p>
+    <p>The last cat toy you'll ever need. Prekko Pawbot is still a working prototype, and its price and ship date are not set yet. People on the list get launch updates by email. Working prototype shown; final design may differ.</p>
+  </div></details>
 </section>
 
 <section class="join" id="join" aria-labelledby="join-h">
-  <img data-src="media/stills/10-waitlist-800.webp" data-srcset="media/stills/10-waitlist-800.webp 800w, media/stills/10-waitlist.webp 1200w" sizes="100vw" width="1200" height="676" loading="lazy" decoding="async" alt="">
+  <img data-s="10-waitlist" width="1200" height="676" loading="lazy" decoding="async" alt="">
   <div class="sec">
     <h2 id="join-h">The last cat toy you'll ever need.</h2>
     <p class="lede">Join the waitlist and hear first when orders open.</p>
@@ -285,24 +290,14 @@ dialog[open]{display:flex;flex-direction:column}
   </div>
 </footer>
 
-<dialog id="dlg" aria-label="The full film">
+<dialog id="dlg" aria-label="The film, with sound">
   <div class="dbar">
-    <p>Animation based on our working prototype. Final design may differ. Real footage coming soon.</p>
-    <a class="btn btn--sun" href="#join" id="dskip">Skip to the waitlist</a>
-    <button class="btn btn--ghost" type="button" id="dclose">Close</button>
+    <p>Animation based on our working prototype. Final design may differ.</p>
+    <button class="btn btn--ghost" type="button" id="restart">Restart</button>
+    <button class="btn btn--sun" type="button" id="dskip">Skip to the waitlist</button>
+    <button class="btn btn--ghost" type="button" id="dclose" autofocus>Close</button>
   </div>
-  <video id="fv" controls playsinline preload="none" aria-describedby="fvnote"></video>
-  <details class="tx"><summary id="fvnote">Transcript: the film's words, which are part of the picture</summary><div data-transcript>
-    <p>For a moment, you're a cat. Eyes low, ears up, whiskers forward.</p>
-    <p>Hour six. It's the sixth hour of an empty afternoon. The sun has crawled halfway across the floor, and nothing in this house has moved in hours. Your world sits a hand's width off the ground. You've been waiting all day for something, anything, to happen.</p>
-    <p>Something moved. Then, at the edge of the rug, a feather twitches. Your pupils swell until the whole room goes soft and only that one point stays sharp.</p>
-    <p>Freeze. It stops dead. So do you. Every muscle loads like a spring, because anything that holds this still is hiding something.</p>
-    <p>Dart. It streaks across the sunlight and vanishes behind the cushion. A long pause. Then the tip of it shows again, testing the air. Real prey never runs in circles. It runs, it hides, and it checks whether you're still watching. So does this.</p>
-    <p>Pounce. Now. Got it. Both paws, every claw, the whole long afternoon spent in a single leap. Every hunt deserves an ending you can catch.</p>
-    <p>Who's moving the toy? Meet the Prekko Pawbot. It runs play sessions on its own and stops when your cat loses interest. It doesn't play back a loop. Every move is chosen live, for your cat. Working prototype shown; final design may differ.</p>
-    <p>It learns your cat. Every session teaches it something: which moves make your cat crouch and chase, and which ones they walk away from. (Illustration of how it learns, not recorded data.) Overnight, it trains on the day's play and comes back sharper. It learns how your cat plays and gets better at playing with your cat over time.</p>
-    <p>The last cat toy you'll ever need. Prekko Pawbot is still a working prototype, and its price and ship date are not set yet. People on the list get launch updates by email. Working prototype shown; final design may differ.</p>
-  </div></details>
+  <div id="stage"></div>
 </dialog>
 
 <script>
@@ -310,47 +305,54 @@ dialog[open]{display:flex;flex-direction:column}
   var d = document, w = window, n = navigator, c = n.connection || {};
   var $ = function (id) { return d.getElementById(id); };
   var mm = function (q) { return !!(w.matchMedia && w.matchMedia(q).matches); };
-  var v = $("v"), film = $("film"), l2 = $("l2"), snd = $("snd"), pp = $("pp"), big = $("play"), end = $("end");
-  var slow = /2g/.test(c.effectiveType || "");
-  var calm = mm("(prefers-reduced-motion: reduce)") || c.saveData === true || slow;
-  var av1 = false, userPaused = false, autoPaused = false, started = false, inView = true;
-  var TWITCH = 3.0; // hero time of the first twitch: the headline's second line arrives with it
-  var HERO_MB = "2.4"; // the 720p hero, for the reduced-motion Play button
+  var v = $("v"), film = $("film"), pp = $("pp"), big = $("play"), end = $("end"), bar = $("prog"), dlg = $("dlg"), stage = $("stage");
+  var et = c.effectiveType || "", low = c.saveData === true || /2g|3g/.test(et);
+  // Reduced motion, Save-Data and 2g wait for a tap; everyone else gets the film playing, muted
+  var calm = mm("(prefers-reduced-motion: reduce)") || c.saveData === true || /2g/.test(et);
+  var done = false, av1 = false, userPaused = false, autoPaused = false, started = false, inView = true, stilled = false;
+  var tall = function () { return mm("(orientation: portrait)"); };
 
-  // Which file: tall on portrait screens; 1080p only for screens with the pixels for it, on capable, unmetered devices.
-  function pick(kind) {
-    var tall = mm("(orientation: portrait)"), px = w.innerWidth * (w.devicePixelRatio || 1);
-    // Device pixels: a 1280x720 laptop (the commonest cheap screen) and every phone get 720p; tablets and big screens 1080p
-    var hi = (tall ? px >= 1400 : px >= 1600) && (n.hardwareConcurrency || 2) > 4 && !c.saveData && !/2g|3g/.test(c.effectiveType || "");
-    return "media/" + kind + "-" + (tall ? "tall" : "wide") + "-" + (hi ? 1080 : 720);
+  // Tall on portrait screens. 1080p only where the line is known to carry it: a 4g connection on a screen 1200 CSS px
+  // wide (tall: 1600 high) or 2x+; without NetInfo (Safari, Firefox) only on a computer-sized window. 720p for the rest,
+  // Save-Data, 2g/3g, and any line whose poster came in under 3 Mbps (or not within 2 s).
+  var posterMbps = Infinity;
+  function measure(img) {
+    var e = w.performance && performance.getEntriesByName && performance.getEntriesByName(img.currentSrc || img.src)[0];
+    var bytes = e && (e.encodedBodySize || e.transferSize), ms = e && e.responseEnd - e.responseStart;
+    if (bytes > 8000 && e.transferSize !== 0 && ms > 0) posterMbps = bytes * 8 / ms / 1000; // a cached poster says nothing
   }
-  // WebM (AV1) first only where the device decodes it efficiently; H.264 otherwise. #t= starts mid-film.
-  function setSrc(el, base, t) {
-    var list = [[".webm", 'video/webm; codecs="av01.0.08M.08, opus"'], [".mp4", 'video/mp4; codecs="avc1.640028, mp4a.40.2"']];
+  function pick() {
+    var t = tall(), big = t ? w.innerHeight >= 1600 : w.innerWidth >= 1200, dense = (w.devicePixelRatio || 1) >= 2;
+    var hi = !low && posterMbps >= 3 && (et === "4g" ? big || dense : !et && big && !t);
+    return "media/film-" + (t ? "tall" : "wide") + "-" + (hi ? 1080 : 720);
+  }
+  // AV1 WebM first where the device decodes it well, then H.264. #t= starts mid-film.
+  function setSrc(base, t) {
+    var list = [[".webm", 'video/webm; codecs="av01.0.08M.10, opus"'], [".mp4", 'video/mp4; codecs="avc1.' + (/tall-1080/.test(base) ? "640032" : "64002A") + ', mp4a.40.2"']];
     if (!av1) list.reverse();
-    el.textContent = "";
+    v.textContent = "";
     list.forEach(function (x) {
       var s = d.createElement("source");
       s.src = base + x[0] + (t ? "#t=" + t : "");
       s.type = x[1];
-      el.appendChild(s);
+      v.appendChild(s);
     });
-    el.lastChild.addEventListener("error", function () { if (el === v) { film.classList.add("nov"); big.hidden = true; reveal(); } });
-    el.load();
+    v.lastChild.addEventListener("error", function () { film.classList.add("nov"); big.hidden = true; });
+    v.load();
   }
-  function reveal() { l2.classList.remove("wait"); }
-  function play(el) {
-    var p = el.play();
-    if (p && p.catch) p.catch(function () { if (el === v && v.paused && !v.ended) idle(); });
+  function play() {
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { if (v.paused && !v.ended && !dlg.open) idle(); });
   }
-  function idle() { film.classList.add("idle"); big.hidden = false; reveal(); stills(); }
-  // Card and waitlist images stay off the network until the hero is moving (or will not move)
-  var stilled = false;
+  function idle() { film.classList.add("idle"); big.hidden = false; stills(); }
+  // Card and waitlist images stay off the network until the film is moving (or will not move)
   function stills() {
     if (stilled) return; stilled = true;
-    [].forEach.call(d.querySelectorAll("img[data-src]"), function (im) {
-      if (im.dataset.srcset) im.srcset = im.dataset.srcset;
-      im.src = im.dataset.src;
+    [].forEach.call(d.querySelectorAll("img[data-s]"), function (im) {
+      var s = "media/stills/" + im.dataset.s, j = im.dataset.s[1] == "0";
+      im.srcset = s + "-480.webp 480w, " + s + "-800.webp 800w" + (j ? ", " + s + ".webp 1200w" : "");
+      im.sizes = j ? "100vw" : "(min-width: 1100px) 380px, (min-width: 700px) 44vw, 86vw";
+      im.src = s + "-800.webp";
     });
   }
   function syncPP() {
@@ -358,51 +360,67 @@ dialog[open]{display:flex;flex-direction:column}
     pp.classList.toggle("paused", paused);
     pp.setAttribute("aria-label", paused ? "Play" : "Pause");
   }
-  function syncSnd() {
-    // The name says what the button does; no pressed state, so it is never read backwards
-    snd.classList.toggle("on", !v.muted);
-    snd.lastChild.textContent = v.muted ? "Tap for sound" : "Mute";
+  function toJoin() {
+    $("join").scrollIntoView({ behavior: calm ? "auto" : "smooth" });
+    setTimeout(function () { $("email").focus({ preventScroll: true }); }, calm ? 0 : 900);
   }
 
   v.addEventListener("playing", function () {
-    started = true; big.hidden = true; end.hidden = true;
-    film.classList.add("on"); film.classList.remove("idle", "ended"); syncPP();
+    started = true; done = false; big.hidden = true; end.hidden = true;
+    film.classList.add("on"); film.classList.remove("idle", "ended", "hold"); syncPP();
     setTimeout(stills, 1500);
   });
   v.addEventListener("pause", syncPP);
-  v.addEventListener("timeupdate", function tu() {
-    if (v.currentTime >= TWITCH) { reveal(); v.removeEventListener("timeupdate", tu); }
-  });
+  v.addEventListener("timeupdate", function () { if (v.duration) bar.style.transform = "scaleX(" + v.currentTime / v.duration + ")"; });
   v.addEventListener("ended", function () {
-    var kb = film.contains(d.activeElement) && !end.contains(d.activeElement);
-    film.classList.add("ended"); end.hidden = false; syncPP();
-    // Pause and Sound vanish at the end: a keyboard user on them lands on the end screen, which then stays put
-    if (kb) { $("endjoin").focus(); return; }
-    // The film drops into the page, unless the visitor has already moved on
+    syncPP(); done = true; film.classList.add("ended"); end.hidden = false;
+    v.currentTime = Math.max(0, v.duration - 2.4);
+    v.addEventListener("seeked", function h() { v.removeEventListener("seeked", h); if (done) film.classList.add("hold"); });
+    // Watched with sound: back to the page, straight to the waitlist the film ends on
+    if (dlg.open) { dlg.close(); toJoin(); return; }
+    if (film.contains(d.activeElement)) { $("endjoin").focus(); return; }
+    // The film settles into the cards, unless the visitor has already moved on
     if (w.scrollY < 40 && !d.hidden) setTimeout(function () {
-      if (w.scrollY < 40 && !$("dlg").open && !film.contains(d.activeElement)) $("what").scrollIntoView({ behavior: calm ? "auto" : "smooth" });
-    }, 1400);
+      if (w.scrollY < 40 && !dlg.open && !film.contains(d.activeElement)) $("what").scrollIntoView({ behavior: calm ? "auto" : "smooth" });
+    }, 2600);
   });
-  v.addEventListener("volumechange", syncSnd);
 
-  snd.onclick = function () {
-    v.muted = !v.muted;
-    if (!v.muted && v.paused && !v.ended) { userPaused = false; play(v); }
-  };
   pp.onclick = function () {
-    if (v.paused || v.ended) { userPaused = false; play(v); } else { userPaused = true; v.pause(); }
+    if (v.paused || done) { userPaused = false; if (done) v.currentTime = 0; if (!v.firstChild) setSrc(pick()); play(); } else { userPaused = true; v.pause(); }
   };
-  v.onclick = function () { if (v.muted) snd.onclick(); else pp.onclick(); };
-  big.onclick = function () {
+  v.onclick = function () { if (!dlg.open) pp.onclick(); };
+  big.onclick = function () { big.hidden = true; film.classList.remove("idle"); pp.onclick(); };
+  $("again").onclick = function () { v.currentTime = 0; userPaused = false; play(); };
+
+  // Enable sound: the same film opens full-window with sound and controls, from the beginning (a card: from its moment)
+  function theater(t) {
+    if (t == null) t = 0;
+    if (!v.firstChild) { setSrc(pick(), t); v.preload = "auto"; } else v.currentTime = t;
     big.hidden = true; film.classList.remove("idle");
-    if (!v.firstChild) setSrc(v, pick("hero"));
-    v.muted = false; userPaused = false; play(v);
-  };
-  $("again").onclick = function () { v.currentTime = 0; userPaused = false; play(v); };
+    v.muted = false; userPaused = false; v.controls = true;
+    if (dlg.showModal) { stage.appendChild(v); v.tabIndex = 0; if (!dlg.open) dlg.showModal(); }
+    play();
+  }
+  $("snd").onclick = function () { theater(); };
+  d.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-film]");
+    if (b) theater(+(tall() && b.dataset.tall || b.dataset.film));
+  });
+  $("restart").onclick = function () { v.currentTime = 0; play(); };
+  $("dclose").onclick = function () { dlg.close(); };
+  $("dskip").onclick = function () { dlg.close(); toJoin(); };
+  dlg.addEventListener("close", function () {
+    // Back on the page the film keeps going, muted, where it was
+    var was = !v.paused;
+    film.insertBefore(v, film.children[1]);
+    v.controls = false; v.tabIndex = -1; v.muted = true;
+    if (!inView || done) { if (!v.paused) { autoPaused = true; v.pause(); } }
+    else if (was) play();
+  });
 
   // Pause when the film leaves the screen or the tab is hidden; pick up again on return.
-  function away() { if (!v.paused && !v.ended) { autoPaused = true; v.pause(); } }
-  function back() { if (autoPaused && !userPaused && !v.ended && inView && !d.hidden && !$("dlg").open) { autoPaused = false; play(v); } }
+  function away() { if (!v.paused && !v.ended && !dlg.open) { autoPaused = true; v.pause(); } }
+  function back() { if (autoPaused && !userPaused && !done && inView && !d.hidden) { autoPaused = false; play(); } }
   if ("IntersectionObserver" in w) {
     new IntersectionObserver(function (e) { inView = e[0].isIntersecting; inView ? back() : away(); }, { threshold: 0.2 }).observe(film);
     new IntersectionObserver(function (e) { $("top").classList.toggle("solid", !e[0].isIntersecting); }).observe($("sentinel"));
@@ -414,56 +432,37 @@ dialog[open]{display:flex;flex-direction:column}
   if (mq) (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function () {
     if (!v.firstChild) return;
     var t = v.currentTime, was = !v.paused;
-    setSrc(v, pick("hero"), t > 0.1 ? t.toFixed(2) : 0);
-    if (was) play(v);
+    setSrc(pick(), t > 0.1 ? t.toFixed(2) : 0);
+    if (was) play();
   });
 
-  if (calm) {
-    $("playmeta").textContent = "0:26, about " + HERO_MB + " MB";
-    idle();
-  } else {
-    l2.classList.add("wait");
-    var once = function () { once = function () {}; setSrc(v, pick("hero")); v.preload = "auto"; play(v); };
-    var mc = n.mediaCapabilities;
-    setTimeout(function () { once(); }, 350);
-    if (mc && mc.decodingInfo) mc.decodingInfo({ type: "file", video: { contentType: 'video/webm; codecs="av01.0.08M.08"', width: 1920, height: 1080, bitrate: 1400000, framerate: 30 } })
-      .then(function (r) { av1 = !!(r.supported && r.powerEfficient); }, function () {})
-      .then(function () { once(); });
-    else once();
-    // A browser that neither plays nor refuses (Low Power Mode, data saver) gets the Play button
-    setTimeout(function () { if (!started && v.paused) idle(); }, 4000);
+  if (calm) idle();
+  else {
+    // Starts once the poster is in (it times the line) and the AV1 check has answered, or after 2 s with what is known.
+    // The muted film starts just past its fade up from black, on the opening card the poster already shows.
+    var once = function () {
+      once = function () {};
+      setSrc(pick(), 0.8); v.preload = "auto"; play();
+      // A browser that neither plays nor refuses (Low Power Mode, data saver) gets the Play button
+      setTimeout(function () { if (!started && v.paused) idle(); }, 4000);
+    };
+    var posterIn = false, codecIn = false, img = film.querySelector("img");
+    var ready = function () { if (posterIn && codecIn) once(); };
+    var shown = function () { posterIn = true; measure(img); ready(); };
+    var mc = n.mediaCapabilities, t0 = tall(), hd = !low && (t0 ? w.innerHeight >= 1600 : w.innerWidth >= 1200 || (w.devicePixelRatio || 1) >= 2);
+    if (img.complete && img.naturalWidth) shown();
+    else { img.addEventListener("load", shown); img.addEventListener("error", function () { posterIn = true; ready(); }); }
+    setTimeout(function () {
+      if (!posterIn) posterMbps = 0; // no poster in 2 s: a slow line
+      if (!codecIn) av1 = v.canPlayType('video/webm; codecs="av01.0.08M.10"') === "probably"; // the check is slow: a weak device
+      once();
+    }, 2000);
+    if (mc && mc.decodingInfo) mc.decodingInfo({ type: "file", video: { contentType: 'video/webm; codecs="av01.0.08M.10"', width: t0 ? (hd ? 1080 : 720) : (hd ? 1920 : 1280), height: t0 ? (hd ? 2160 : 1440) : (hd ? 1080 : 720), bitrate: hd ? 2000000 : 1000000, framerate: 30 } })
+      .then(function (r) { av1 = !!(r.supported && (r.powerEfficient || (r.smooth && (n.hardwareConcurrency || 2) >= 4))); }, function () {})
+      .then(function () { codecIn = true; ready(); });
+    else { codecIn = true; ready(); }
     setTimeout(stills, 6000);
   }
-  syncSnd();
-  setTimeout(function () { snd.classList.add("nudge"); }, 4000);
-
-  // The full film: loads only on tap, so it starts with sound.
-  var dlg = $("dlg"), fv = $("fv"), heroAt = -1;
-  function openFilm(t) {
-    if (!dlg.showModal) { location.href = pick("film") + ".mp4" + (t ? "#t=" + t : ""); return; }
-    if (!v.paused) { autoPaused = false; userPaused = true; v.pause(); }
-    // A hero still downloading would fight the film for the line: let go of it, and pick it up again on close
-    var b = v.buffered;
-    if (v.firstChild && !v.ended && !(b.length && v.duration && b.end(b.length - 1) >= v.duration - 0.5)) {
-      heroAt = v.currentTime; v.textContent = ""; v.removeAttribute("src"); v.load();
-    }
-    setSrc(fv, pick("film"), t);
-    fv.muted = false;
-    dlg.showModal();
-    play(fv);
-  }
-  d.addEventListener("click", function (e) {
-    var b = e.target.closest && e.target.closest("[data-film]");
-    if (b) openFilm(+b.getAttribute("data-film") || 0);
-  });
-  $("dclose").onclick = function () { dlg.close(); };
-  $("dskip").onclick = function () { dlg.close(); setTimeout(function () { $("email").focus({ preventScroll: true }); }, 400); };
-  dlg.addEventListener("close", function () {
-    fv.pause();
-    if (heroAt >= 0) { v.preload = "metadata"; setSrc(v, pick("hero"), heroAt > 0.1 ? heroAt.toFixed(2) : 0); heroAt = -1; }
-  });
-  // The film ends on the waitlist card: go straight to the form
-  fv.addEventListener("ended", function () { $("dskip").onclick(); $("join").scrollIntoView(); });
 
   // The waitlist: JSON to the Worker. The address stays in the field until it is safely on the list.
   var WAITLIST_ENDPOINT = "https://api.prekko.com/lead";
