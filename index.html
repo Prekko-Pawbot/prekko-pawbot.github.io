@@ -156,7 +156,12 @@ h2{font-size:clamp(32px,4vw,56px);line-height:1.05;max-width:20ch;text-wrap:bala
 .card button{margin-top:auto;align-self:flex-start;background:none;border:0;padding:0;min-height:44px;color:var(--sun);font:400 15px/1 var(--sans);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 .card button:hover{text-decoration:underline;text-underline-offset:3px}
 @media (min-width:700px){.cards{grid-auto-columns:44%}}
-@media (min-width:1100px){.cards{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;margin:40px 0 0;padding:0;gap:18px}}
+@media (min-width:1100px){.cards{grid-auto-flow:row;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;margin:40px 0 0;padding:0;gap:18px}
+  /* The privacy promise closes the row on its own: picture left, words right */
+  .card--wide{grid-column:1/-1;flex-direction:row}
+  .card--wide img{width:calc((100% - 36px) / 3 * 2 + 18px);flex:none}
+  .card--wide div{justify-content:center;padding:28px 32px}
+  .card--wide h3{font-size:40px}}
 
 .qa{max-width:760px}
 details{border-top:1px solid var(--line)}
@@ -227,7 +232,7 @@ dialog[open]{display:flex;flex-direction:column}
     <div class="ctl"><button class="pill" id="pp" type="button" aria-label="Pause"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15L19.5 12z" fill="currentColor"/></svg></button></div>
     <div class="cue" id="cue" role="status" aria-live="polite" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span><b>The film is playing muted.</b>Tap Enable sound to hear it.</span><svg class="dn" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m-6-6l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <button class="pill mchip" id="mchip" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Turn sound on</button>
-    <button class="big" id="play" type="button" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17L20 12z" fill="currentColor"/></svg></i><b>Play the film<span>2½ minutes</span></b></button>
+    <button class="big" id="play" type="button" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17L20 12z" fill="currentColor"/></svg></i><b>Play the film<span>2¾ minutes</span></b></button>
     <div class="end" id="end" hidden>
       <a class="btn btn--sun" href="#join" id="endjoin">Join the waitlist</a>
       <button class="btn btn--ghost" type="button" id="again">Watch again</button>
@@ -250,13 +255,14 @@ dialog[open]{display:flex;flex-direction:column}
   <p class="eyebrow">What it does</p>
   <h2 id="what-h">Real prey never runs in circles. Neither does this.</h2>
   <p class="lede">Sun on the floor, and nothing has moved since noon. Here is what changes.</p>
-  <ol class="cards" tabindex="0" aria-label="What it does, six cards">
+  <ol class="cards" tabindex="0" aria-label="What it does, seven cards">
     <li class="card"><img data-s="04-dart" width="800" height="450" loading="lazy" decoding="async" alt="The feather lure low over a sunlit wooden floor."><div><span class="num">i</span><h3>It moves like prey.</h3><p>At your cat's pace, never in a loop. Every move is chosen live.</p><button type="button" data-film="38.9">Watch this moment<span class="sr">: It moves like prey</span> <span aria-hidden="true">&#9656;</span></button></div></li>
     <li class="card"><img data-s="05-pounce" width="800" height="450" loading="lazy" decoding="async" alt="Two ginger paws pin the feather lure at the end of a pounce."><div><span class="num">ii</span><h3>Every hunt ends with a catch.</h3><p>Not a red dot that can never be caught. Your cat gets to finish what it starts.</p><button type="button" data-film="55.8">Watch this moment<span class="sr">: Every hunt ends with a catch</span> <span aria-hidden="true">&#9656;</span></button></div></li>
     <li class="card"><img data-s="06-who" width="800" height="450" loading="lazy" decoding="async" alt="A ginger cat crouches behind the small robot, watching the feather lure it holds out on its fishing rod."><div><span class="num">iii</span><h3>It plays on its own.</h3><p>It runs play sessions by itself and stops when your cat loses interest.</p><button type="button" data-film="68.6">Watch this moment<span class="sr">: It plays on its own</span> <span aria-hidden="true">&#9656;</span></button></div></li>
     <li class="card"><img data-s="07-how-it-works" width="800" height="450" loading="lazy" decoding="async" alt="An illustration of the AI at work: glowing lines trace the cat, a ring of light rises from the robot, and panels of small tiles and dials stand for the many choices it weighs."><span class="tag" aria-hidden="true">Illustration</span><div><span class="num">iv</span><h3>Multi-layered AI.</h3><p>Several AI systems, working as one: they read your cat, choose the next move and shape it as it happens. Endless variations, no preset loops.</p><button type="button" data-film="87.4">Watch this moment<span class="sr">: Multi-layered AI</span> <span aria-hidden="true">&#9656;</span></button></div></li>
     <li class="card"><img data-s="08-learns" width="800" height="450" loading="lazy" decoding="async" alt="An illustration of the lure's path, drawn as glowing lines. Illustration, not recorded data."><span class="tag" aria-hidden="true">Illustration</span><div><span class="num">v</span><h3>It learns your cat.</h3><p>It notices which moves your cat chases and which it ignores. Overnight, it trains on the day's play, so tomorrow it plays more of what your cat loves.</p><button type="button" data-film="112.3">Watch this moment<span class="sr">: It learns your cat</span> <span aria-hidden="true">&#9656;</span></button></div></li>
-    <li class="card"><img data-s="09-your-cats-day" width="800" height="450" loading="lazy" decoding="async" alt="The room in late sun, the lure resting on the rug."><div><span class="num">vi</span><h3>You're in charge.</h3><p>You control it from your phone: start play, stop it, or let it run its own sessions.</p><button type="button" data-film="133.5" data-tall="133.0">Watch this moment<span class="sr">: You're in charge</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card"><img data-s="10-your-cats-day" width="800" height="450" loading="lazy" decoding="async" alt="The room in late sun, the lure resting on the rug."><div><span class="num">vi</span><h3>You're in charge.</h3><p>You control it from your phone: start play, stop it, or let it run its own sessions.</p><button type="button" data-film="147.3" data-tall="146.8">Watch this moment<span class="sr">: You're in charge</span> <span aria-hidden="true">&#9656;</span></button></div></li>
+    <li class="card card--wide"><img data-s="09-stays-home" width="800" height="450" loading="lazy" decoding="async" alt="The ginger cat crouched by the small robot in a dim room, watching the feather lure."><div><span class="num">vii</span><h3>What it sees stays home.</h3><p>Everything it sees stays on the robot. No video ever leaves it unless you opt in, and opting in is never needed for it to learn your cat.</p><button type="button" data-film="133.5">Watch this moment<span class="sr">: What it sees stays home</span> <span aria-hidden="true">&#9656;</span></button></div></li>
   </ol>
 </section>
 
@@ -265,7 +271,7 @@ dialog[open]{display:flex;flex-direction:column}
   <h2 id="qa-h" class="sr">Straight answers</h2>
   <details><summary>What is it, exactly?</summary><p>A small robot that moves a fishing-rod toy like prey. It plays on its own, learns how your cat likes to play, and you control it from your phone.</p></details>
   <details><summary>Can I buy one?</summary><p>Not yet. The waitlist hears first when orders open.</p></details>
-  <details><summary>Will my cat get bored of it?</summary><p>It never plays a loop. It learns which moves your cat chases and which it walks away from, and keeps changing as your cat does.</p></details>
+  <details><summary>Does video of my cat ever leave my home?</summary><p>Not unless you opt in. Everything it sees stays on the robot. Sharing is completely optional, and it isn't needed for it to learn your cat: it learns just as well if you never opt in.</p></details>
   <details><summary>Is the film real footage?</summary><p>It's an animation built from our working prototype's design. Real footage of the prototype playing with cats replaces it soon. Final design may differ.</p></details>
   <details><summary>What happens when I join?</summary><p>A welcome email, occasional progress news and the launch announcement. Every email has an unsubscribe link.</p></details>
   <details><summary>Read the film's words</summary><div id="words" data-transcript>
@@ -278,13 +284,14 @@ dialog[open]{display:flex;flex-direction:column}
     <p>Who's moving the toy? Meet the Prekko Pawbot™. It runs play sessions on its own and stops when your cat loses interest. It doesn't play back a loop. Every move is chosen live, for your cat. Working prototype shown; final design may differ.</p>
     <p>Multi-layered AI. Several AI systems, working as one. See: It reads your cat in real time: where they are, how fast they move, where they look, how low they crouch and how interested they are. (Illustration, not the real model.) Choose: A strategy layer reads your cat's mood and picks the moves your cat chases. Move: A motion layer fine-tunes every move as it happens. Endless variations. No preset loops.</p>
     <p>It learns your cat. Every session teaches it something: which moves make your cat crouch and chase, and which ones they walk away from. (Illustration of how it learns, not recorded data.) Overnight, it trains on the day's play and comes back sharper. It learns how your cat plays and gets better at playing with your cat over time.</p>
+    <p>What it sees stays home. Everything it sees stays on the robot. No video ever leaves it unless you opt in. Opting in is completely optional, and it isn't needed for it to learn your cat.</p>
     <p>Your cat's day. You control it from your phone. A planned tracker in the app would keep the story of each day: when the hunts happened, how long they lasted, and the quiet stretches in between. (Planned feature, not in the prototype shown; example numbers.)</p>
     <p>The last cat toy you'll ever need. Prekko Pawbot is still a working prototype, and its price and ship date are not set yet. People on the list get launch updates by email. Working prototype shown; final design may differ.</p>
   </div></details>
 </section>
 
 <section class="join" id="join" aria-labelledby="join-h">
-  <img data-s="10-waitlist" width="1200" height="676" loading="lazy" decoding="async" alt="">
+  <img data-s="11-waitlist" width="1200" height="676" loading="lazy" decoding="async" alt="">
   <div class="sec">
     <h2 id="join-h">The last cat toy you'll ever need.</h2>
     <p class="lede">Join the waitlist and hear first when orders open.</p>
@@ -370,7 +377,7 @@ dialog[open]{display:flex;flex-direction:column}
   function stills() {
     if (stilled) return; stilled = true;
     [].forEach.call(d.querySelectorAll("img[data-s]"), function (im) {
-      var s = "media/stills/" + im.dataset.s, j = im.dataset.s[1] == "0";
+      var s = "media/stills/" + im.dataset.s, j = /waitlist$/.test(im.dataset.s);
       im.srcset = s + "-480.webp 480w, " + s + "-800.webp 800w" + (j ? ", " + s + ".webp 1200w" : "");
       im.sizes = j ? "100vw" : "(min-width: 1100px) 380px, (min-width: 700px) 44vw, 86vw";
       im.src = s + "-800.webp";
